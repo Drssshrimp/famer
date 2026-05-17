@@ -6,8 +6,9 @@ public class famerTarget : TargetRules
 	public famerTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Game;
-		DefaultBuildSettings = BuildSettingsVersion.V2;
+		DefaultBuildSettings = BuildSettingsVersion.V5;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
+		CppStandard = CppStandardVersion.Cpp20;
 		ExtraModuleNames.Add("CatchAnimals");
 	}
 }
