@@ -29,6 +29,7 @@ ACatchAnimal::ACatchAnimal()
 	AnimalId = 0;
 	PlayCenter = FVector::ZeroVector;
 	PlayRadius = 1600.0f;
+	GroundZ = 55.0f;
 	MoveSpeed = 170.0f;
 	DirectionChangeTime = 2.0f;
 	DirectionTimer = 0.0f;
@@ -51,6 +52,7 @@ void ACatchAnimal::BeginPlay()
 			FLinearColor(0.80f, 0.32f, 0.92f)
 		};
 		DynamicMaterial->SetVectorParameterValue(TEXT("Color"), Colors[FMath::Abs(AnimalId) % UE_ARRAY_COUNT(Colors)]);
+		DynamicMaterial->SetScalarParameterValue(TEXT("Roughness"), 0.35f);
 	}
 
 	PickNewDirection();
@@ -72,7 +74,7 @@ void ACatchAnimal::Tick(float DeltaSeconds)
 	}
 
 	FVector NewLocation = GetActorLocation() + MoveDirection * MoveSpeed * DeltaSeconds;
-	NewLocation.Z = 45.0f;
+	NewLocation.Z = GroundZ;
 
 	const FVector FromCenter = NewLocation - PlayCenter;
 	const FVector FlatFromCenter(FromCenter.X, FromCenter.Y, 0.0f);
@@ -96,6 +98,7 @@ void ACatchAnimal::InitializeAnimal(int32 InAnimalId, const FVector& InPlayCente
 	AnimalId = InAnimalId;
 	PlayCenter = InPlayCenter;
 	PlayRadius = InPlayRadius;
+	GroundZ = GetActorLocation().Z;
 	MoveSpeed = FMath::RandRange(120.0f, 230.0f);
 	DirectionChangeTime = FMath::RandRange(1.2f, 3.5f);
 	PickNewDirection();

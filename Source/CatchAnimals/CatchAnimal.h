@@ -38,6 +38,7 @@ private:
 	int32 AnimalId;
 	FVector PlayCenter;
 	float PlayRadius;
+	float GroundZ;
 	float MoveSpeed;
 	float DirectionChangeTime;
 	float DirectionTimer;
