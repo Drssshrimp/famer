@@ -33,6 +33,7 @@ private:
 	void UpdateHud();
 	void CheckCatchInput();
 	void HandleCatchInput();
+	void PlayCatchAnimation() const;
 	void CaptureAnimal(ACatchAnimal* Animal);
 	void SetPlayerInputPaused(bool bPaused);
 	FVector GetPlayCenter() const;

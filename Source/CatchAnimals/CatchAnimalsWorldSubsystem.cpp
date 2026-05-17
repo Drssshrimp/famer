@@ -2,9 +2,13 @@
 
 #include "CatchAnimal.h"
 #include "CatchAnimalsHUDWidget.h"
+#include "Animation/AnimInstance.h"
+#include "Animation/AnimMontage.h"
 #include "Engine/World.h"
+#include "GameFramework/Character.h"
 #include "GameFramework/Pawn.h"
 #include "GameFramework/PlayerController.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "InputCoreTypes.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -155,6 +159,7 @@ void UCatchAnimalsWorldSubsystem::SpawnAnimalsForNode()
 		if (Animal)
 		{
 			Animal->InitializeAnimal(++AnimalIdCounter, GetPlayCenter(), PlayRadius);
+			Animal->SetFlyingAnimal(FMath::FRand() < 0.35f);
 			SpawnedAnimals.Add(Animal);
 		}
 	}
@@ -219,7 +224,9 @@ void UCatchAnimalsWorldSubsystem::HandleCatchInput()
 		return;
 	}
 
-	const float CatchRadius = 260.0f;
+	PlayCatchAnimation();
+
+	const float CatchRadius = 420.0f;
 	ACatchAnimal* BestAnimal = nullptr;
 	float BestDistanceSquared = FMath::Square(CatchRadius);
 
@@ -230,7 +237,7 @@ void UCatchAnimalsWorldSubsystem::HandleCatchInput()
 			continue;
 		}
 
-		const float DistanceSquared = FVector::DistSquared2D(PlayerPawn->GetActorLocation(), Animal->GetActorLocation());
+		const float DistanceSquared = FVector::DistSquared(PlayerPawn->GetActorLocation(), Animal->GetActorLocation());
 		if (DistanceSquared <= BestDistanceSquared)
 		{
 			BestDistanceSquared = DistanceSquared;
@@ -241,6 +248,27 @@ void UCatchAnimalsWorldSubsystem::HandleCatchInput()
 	if (BestAnimal)
 	{
 		CaptureAnimal(BestAnimal);
+	}
+}
+
+void UCatchAnimalsWorldSubsystem::PlayCatchAnimation() const
+{
+	const ACharacter* Character = Cast<ACharacter>(CachedPawn.Get());
+	if (!Character)
+	{
+		return;
+	}
+
+	USkeletalMeshComponent* Mesh = Character->GetMesh();
+	if (!Mesh || !Mesh->GetAnimInstance())
+	{
+		return;
+	}
+
+	UAnimMontage* AttackMontage = LoadObject<UAnimMontage>(nullptr, TEXT("/Game/Characters/Mannequins/Anims/Unarmed/Attack/MM_Attack_01.MM_Attack_01"));
+	if (AttackMontage)
+	{
+		Mesh->GetAnimInstance()->Montage_Play(AttackMontage, 1.25f);
 	}
 }
 
