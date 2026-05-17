@@ -24,6 +24,48 @@
 
 仓库里的工程当前关联 UE 5.6。如果你的 UE 版本不是 5.6，打开工程时如果提示版本不一致，选择转换或切换到你本机安装的 UE5 版本即可。
 
+## UE 安装方法
+
+1. 打开 Epic 官方下载页：
+
+   `https://www.unrealengine.com/download`
+
+2. 下载并安装 `Epic Games Launcher`。
+
+3. 打开 `Epic Games Launcher`，登录 Epic 账号。
+
+4. 左侧点击 `Unreal Engine`。
+
+5. 进入上方的 `Library` 页面。
+
+6. 在 `ENGINE VERSIONS` 区域点击 `+`。
+
+7. 版本建议选择 `5.6`。如果没有 5.6，就选择你能安装的 UE5 版本。
+
+8. 点击 `Install`，选择安装位置，等待下载完成。
+
+9. 安装完成后，按钮会变成 `Launch`，说明 UE 已经安装好。
+
+## Visual Studio 安装方法
+
+1. 打开 Visual Studio 官方下载页：
+
+   `https://visualstudio.microsoft.com/zh-hans/downloads/`
+
+2. 下载并安装 `Visual Studio 2022 Community`。
+
+3. 安装器里勾选工作负载：
+
+   `使用 C++ 的游戏开发`
+
+4. 右侧安装详细信息里建议确认勾选：
+
+   - `Visual Studio Tools for Unreal Engine`
+   - `Windows 10 SDK` 或 `Windows 11 SDK`
+   - `MSVC v143` C++ 生成工具
+
+5. 点击安装或修改，等待安装完成。
+
 ## 运行步骤
 
 1. 打开项目目录：
@@ -60,6 +102,12 @@
    - 点击 `Build`
 
 6. 编译完成后回到 Unreal Editor，点击顶部的 `Play` 按钮即可运行游戏。
+
+## 第一次打开时可能出现的提示
+
+- 如果提示 `Missing modules`，选择 `Yes` 或 `Rebuild`。
+- 如果提示 UE 版本不一致，选择转换到当前安装的 UE5 版本。
+- 如果右键没有 `Generate Visual Studio project files`，通常是 UE 没装好，或者没有执行 `Switch Unreal Engine version`。
 
 ## 说明
 
