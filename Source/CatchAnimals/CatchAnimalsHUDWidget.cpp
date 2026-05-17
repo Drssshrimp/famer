@@ -99,6 +99,16 @@ void UCatchAnimalsHUDWidget::BuildWidgetTree()
 	ContinueSlot->SetAlignment(FVector2D(0.5f, 0.5f));
 	ContinueSlot->SetPosition(FVector2D::ZeroVector);
 	ContinueSlot->SetSize(FVector2D(260.0f, 64.0f));
+
+	SuccessText = MakeHudText(WidgetTree, TEXT("SuccessText"), 72.0f, FLinearColor(0.28f, 1.0f, 0.42f));
+	SuccessText->SetText(FText::FromString(TEXT("success")));
+	SuccessText->SetJustification(ETextJustify::Center);
+
+	UCanvasPanelSlot* SuccessSlot = RootCanvas->AddChildToCanvas(SuccessText);
+	SuccessSlot->SetAnchors(FAnchors(0.5f, 0.5f, 0.5f, 0.5f));
+	SuccessSlot->SetAlignment(FVector2D(0.5f, 0.5f));
+	SuccessSlot->SetPosition(FVector2D(0.0f, -120.0f));
+	SuccessSlot->SetSize(FVector2D(520.0f, 110.0f));
 }
 
 void UCatchAnimalsHUDWidget::SetHudState(int32 NodeIndex, float RemainingSeconds, int32 CapturedCount, int32 TargetCount, bool bWaitingForContinue, bool bGameOver)
@@ -128,7 +138,7 @@ void UCatchAnimalsHUDWidget::SetHudState(int32 NodeIndex, float RemainingSeconds
 		}
 		if (bGameOver)
 		{
-			Hint = TEXT("Ten animals caught. The game is finished.");
+			Hint = TEXT("success");
 		}
 		HintText->SetText(FText::FromString(Hint));
 	}
@@ -136,6 +146,11 @@ void UCatchAnimalsHUDWidget::SetHudState(int32 NodeIndex, float RemainingSeconds
 	if (ContinueButton)
 	{
 		ContinueButton->SetVisibility(bWaitingForContinue && !bGameOver ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+	}
+
+	if (SuccessText)
+	{
+		SuccessText->SetVisibility(bGameOver ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
 	}
 }
 

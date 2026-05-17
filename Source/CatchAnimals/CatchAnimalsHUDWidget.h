@@ -44,4 +44,7 @@ private:
 
 	UPROPERTY(Transient)
 	TObjectPtr<UButton> ContinueButton;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UTextBlock> SuccessText;
 };

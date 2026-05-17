@@ -34,6 +34,7 @@ private:
 	UStaticMeshComponent* CreateMeshPart(FName Name, const FVector& RelativeLocation, const FVector& RelativeScale);
 	void ConfigureGroundAnimal();
 	void ConfigureBirdAnimal();
+	bool SnapLocationToGround(FVector& InOutLocation);
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USphereComponent> CollisionComponent;

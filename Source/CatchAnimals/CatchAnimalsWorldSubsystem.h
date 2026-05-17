@@ -37,7 +37,7 @@ private:
 	void CaptureAnimal(ACatchAnimal* Animal);
 	void SetPlayerInputPaused(bool bPaused);
 	FVector GetPlayCenter() const;
-	bool FindGroundLocationNearPlayer(FVector& OutLocation) const;
+	bool FindGroundLocationNearPlayer(FVector& OutLocation, bool bForFlyingAnimal) const;
 
 	UPROPERTY()
 	TObjectPtr<UCatchAnimalsHUDWidget> HudWidget;

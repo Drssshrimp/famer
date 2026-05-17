@@ -2,6 +2,7 @@
 
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Engine/World.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -113,7 +114,11 @@ void ACatchAnimal::Tick(float DeltaSeconds)
 	}
 	else
 	{
-		NewLocation.Z = GroundZ;
+		if (!SnapLocationToGround(NewLocation))
+		{
+			NewLocation = GetActorLocation();
+			MoveDirection *= -1.0f;
+		}
 	}
 
 	const FVector FromCenter = NewLocation - PlayCenter;
@@ -151,12 +156,17 @@ void ACatchAnimal::SetFlyingAnimal(bool bInFlyingAnimal)
 	MoveSpeed = bFlyingAnimal ? FMath::RandRange(170.0f, 280.0f) : FMath::RandRange(120.0f, 230.0f);
 	if (bFlyingAnimal)
 	{
-		GroundZ = GetActorLocation().Z + 160.0f;
+		GroundZ = GetActorLocation().Z + 220.0f;
 		SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, GroundZ));
 		ConfigureBirdAnimal();
 	}
 	else
 	{
+		FVector GroundLocation = GetActorLocation();
+		if (SnapLocationToGround(GroundLocation))
+		{
+			SetActorLocation(GroundLocation);
+		}
 		GroundZ = GetActorLocation().Z;
 		ConfigureGroundAnimal();
 	}
@@ -232,27 +242,64 @@ void ACatchAnimal::ConfigureGroundAnimal()
 	if (LeftEarMesh) { LeftEarMesh->SetRelativeLocation(FVector(46.0f, -13.0f, 58.0f)); LeftEarMesh->SetRelativeScale3D(FVector(0.10f, 0.08f, 0.30f)); LeftEarMesh->SetRelativeRotation(FRotator(-18.0f, 0.0f, -12.0f)); LeftEarMesh->SetVisibility(true); }
 	if (RightEarMesh) { RightEarMesh->SetRelativeLocation(FVector(46.0f, 13.0f, 58.0f)); RightEarMesh->SetRelativeScale3D(FVector(0.10f, 0.08f, 0.30f)); RightEarMesh->SetRelativeRotation(FRotator(-18.0f, 0.0f, 12.0f)); RightEarMesh->SetVisibility(true); }
 	if (TailMesh) { TailMesh->SetRelativeLocation(FVector(-42.0f, 0.0f, 22.0f)); TailMesh->SetRelativeScale3D(FVector(0.18f, 0.18f, 0.18f)); TailMesh->SetVisibility(true); }
-	if (BeakMesh) { BeakMesh->SetVisibility(false); }
-	if (LeftWingMesh) { LeftWingMesh->SetVisibility(false); }
-	if (RightWingMesh) { RightWingMesh->SetVisibility(false); }
+	if (BeakMesh) { BeakMesh->SetVisibility(false); BeakMesh->SetHiddenInGame(true); }
+	if (LeftWingMesh) { LeftWingMesh->SetVisibility(false); LeftWingMesh->SetHiddenInGame(true); }
+	if (RightWingMesh) { RightWingMesh->SetVisibility(false); RightWingMesh->SetHiddenInGame(true); }
 	if (FrontLeftLegMesh) { FrontLeftLegMesh->SetRelativeLocation(FVector(26.0f, -18.0f, -20.0f)); FrontLeftLegMesh->SetRelativeScale3D(FVector(0.10f, 0.08f, 0.25f)); FrontLeftLegMesh->SetVisibility(true); }
 	if (FrontRightLegMesh) { FrontRightLegMesh->SetRelativeLocation(FVector(26.0f, 18.0f, -20.0f)); FrontRightLegMesh->SetRelativeScale3D(FVector(0.10f, 0.08f, 0.25f)); FrontRightLegMesh->SetVisibility(true); }
 	if (BackLeftLegMesh) { BackLeftLegMesh->SetRelativeLocation(FVector(-26.0f, -18.0f, -20.0f)); BackLeftLegMesh->SetRelativeScale3D(FVector(0.10f, 0.08f, 0.25f)); BackLeftLegMesh->SetVisibility(true); }
 	if (BackRightLegMesh) { BackRightLegMesh->SetRelativeLocation(FVector(-26.0f, 18.0f, -20.0f)); BackRightLegMesh->SetRelativeScale3D(FVector(0.10f, 0.08f, 0.25f)); BackRightLegMesh->SetVisibility(true); }
+	for (UStaticMeshComponent* Part : {BodyMesh.Get(), HeadMesh.Get(), LeftEarMesh.Get(), RightEarMesh.Get(), TailMesh.Get(), FrontLeftLegMesh.Get(), FrontRightLegMesh.Get(), BackLeftLegMesh.Get(), BackRightLegMesh.Get()})
+	{
+		if (Part) { Part->SetHiddenInGame(false); }
+	}
 }
 
 void ACatchAnimal::ConfigureBirdAnimal()
 {
 	if (BodyMesh) { BodyMesh->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f)); BodyMesh->SetRelativeScale3D(FVector(0.42f, 0.25f, 0.24f)); BodyMesh->SetVisibility(true); }
 	if (HeadMesh) { HeadMesh->SetRelativeLocation(FVector(34.0f, 0.0f, 18.0f)); HeadMesh->SetRelativeScale3D(FVector(0.22f, 0.20f, 0.20f)); HeadMesh->SetVisibility(true); }
-	if (LeftEarMesh) { LeftEarMesh->SetVisibility(false); }
-	if (RightEarMesh) { RightEarMesh->SetVisibility(false); }
+	if (LeftEarMesh) { LeftEarMesh->SetVisibility(false); LeftEarMesh->SetHiddenInGame(true); }
+	if (RightEarMesh) { RightEarMesh->SetVisibility(false); RightEarMesh->SetHiddenInGame(true); }
 	if (TailMesh) { TailMesh->SetRelativeLocation(FVector(-38.0f, 0.0f, 5.0f)); TailMesh->SetRelativeScale3D(FVector(0.22f, 0.12f, 0.08f)); TailMesh->SetVisibility(true); }
 	if (BeakMesh) { BeakMesh->SetRelativeLocation(FVector(58.0f, 0.0f, 18.0f)); BeakMesh->SetRelativeScale3D(FVector(0.12f, 0.08f, 0.10f)); BeakMesh->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f)); BeakMesh->SetVisibility(true); }
 	if (LeftWingMesh) { LeftWingMesh->SetRelativeLocation(FVector(0.0f, -30.0f, 4.0f)); LeftWingMesh->SetRelativeScale3D(FVector(0.38f, 0.08f, 0.13f)); LeftWingMesh->SetVisibility(true); }
 	if (RightWingMesh) { RightWingMesh->SetRelativeLocation(FVector(0.0f, 30.0f, 4.0f)); RightWingMesh->SetRelativeScale3D(FVector(0.38f, 0.08f, 0.13f)); RightWingMesh->SetVisibility(true); }
-	if (FrontLeftLegMesh) { FrontLeftLegMesh->SetVisibility(false); }
-	if (FrontRightLegMesh) { FrontRightLegMesh->SetVisibility(false); }
-	if (BackLeftLegMesh) { BackLeftLegMesh->SetVisibility(false); }
-	if (BackRightLegMesh) { BackRightLegMesh->SetVisibility(false); }
+	if (FrontLeftLegMesh) { FrontLeftLegMesh->SetVisibility(false); FrontLeftLegMesh->SetHiddenInGame(true); }
+	if (FrontRightLegMesh) { FrontRightLegMesh->SetVisibility(false); FrontRightLegMesh->SetHiddenInGame(true); }
+	if (BackLeftLegMesh) { BackLeftLegMesh->SetVisibility(false); BackLeftLegMesh->SetHiddenInGame(true); }
+	if (BackRightLegMesh) { BackRightLegMesh->SetVisibility(false); BackRightLegMesh->SetHiddenInGame(true); }
+	for (UStaticMeshComponent* Part : {BodyMesh.Get(), HeadMesh.Get(), TailMesh.Get(), BeakMesh.Get(), LeftWingMesh.Get(), RightWingMesh.Get()})
+	{
+		if (Part) { Part->SetHiddenInGame(false); }
+	}
+}
+
+bool ACatchAnimal::SnapLocationToGround(FVector& InOutLocation)
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return false;
+	}
+
+	FHitResult Hit;
+	FCollisionQueryParams Params(SCENE_QUERY_STAT(CatchAnimalGroundSnap), false);
+	Params.AddIgnoredActor(this);
+
+	const FVector TraceStart(InOutLocation.X, InOutLocation.Y, InOutLocation.Z + 260.0f);
+	const FVector TraceEnd(InOutLocation.X, InOutLocation.Y, InOutLocation.Z - 720.0f);
+	if (!World->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECC_Visibility, Params))
+	{
+		return false;
+	}
+
+	if (Hit.ImpactNormal.Z < 0.72f)
+	{
+		return false;
+	}
+
+	InOutLocation.Z = Hit.ImpactPoint.Z + 55.0f;
+	GroundZ = InOutLocation.Z;
+	return true;
 }

@@ -146,20 +146,21 @@ void UCatchAnimalsWorldSubsystem::SpawnAnimalsForNode()
 	const int32 NeededAnimals = FMath::Max(0, AnimalsPerNode - SpawnedAnimals.Num());
 	for (int32 Index = 0; Index < NeededAnimals; ++Index)
 	{
+		const bool bSpawnFlyingAnimal = FMath::FRand() < 0.30f;
 		FVector SpawnLocation;
-		if (!FindGroundLocationNearPlayer(SpawnLocation))
+		if (!FindGroundLocationNearPlayer(SpawnLocation, bSpawnFlyingAnimal))
 		{
 			const FVector Center = GetPlayCenter();
 			const float Angle = FMath::FRandRange(0.0f, 2.0f * PI);
 			const float Radius = FMath::FRandRange(250.0f, 900.0f);
-			SpawnLocation = Center + FVector(FMath::Cos(Angle) * Radius, FMath::Sin(Angle) * Radius, 80.0f);
+			SpawnLocation = Center + FVector(FMath::Cos(Angle) * Radius, FMath::Sin(Angle) * Radius, bSpawnFlyingAnimal ? 260.0f : 80.0f);
 		}
 
 		ACatchAnimal* Animal = World->SpawnActor<ACatchAnimal>(ACatchAnimal::StaticClass(), SpawnLocation, FRotator::ZeroRotator);
 		if (Animal)
 		{
 			Animal->InitializeAnimal(++AnimalIdCounter, GetPlayCenter(), PlayRadius);
-			Animal->SetFlyingAnimal(FMath::FRand() < 0.35f);
+			Animal->SetFlyingAnimal(bSpawnFlyingAnimal);
 			SpawnedAnimals.Add(Animal);
 		}
 	}
@@ -342,7 +343,7 @@ FVector UCatchAnimalsWorldSubsystem::GetPlayCenter() const
 	return PlayerPawn ? PlayerPawn->GetActorLocation() : FVector::ZeroVector;
 }
 
-bool UCatchAnimalsWorldSubsystem::FindGroundLocationNearPlayer(FVector& OutLocation) const
+bool UCatchAnimalsWorldSubsystem::FindGroundLocationNearPlayer(FVector& OutLocation, bool bForFlyingAnimal) const
 {
 	UWorld* World = GetWorld();
 	const APawn* PlayerPawn = CachedPawn.Get();
@@ -366,8 +367,11 @@ bool UCatchAnimalsWorldSubsystem::FindGroundLocationNearPlayer(FVector& OutLocat
 
 		if (World->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECC_Visibility, Params))
 		{
-			OutLocation = Hit.ImpactPoint + FVector(0.0f, 0.0f, 55.0f);
-			return true;
+			if (Hit.ImpactNormal.Z >= 0.78f)
+			{
+				OutLocation = Hit.ImpactPoint + FVector(0.0f, 0.0f, bForFlyingAnimal ? 260.0f : 55.0f);
+				return true;
+			}
 		}
 	}
 
