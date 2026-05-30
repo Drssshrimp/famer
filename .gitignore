@@ -1,0 +1,14 @@
+# 编译/缓存目录
+Binaries/
+Intermediate/
+Saved/
+DerivedDataCache/
+Build/
+
+# IDE/系统文件
+.vs/
+.vscode/
+.idea/
+.DS_Store
+*.sln
+*.suo
